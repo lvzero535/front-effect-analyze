@@ -1,0 +1,35 @@
+{
+  "path": "E:/DevPrograms/CodeRepository/dev-products/project-modify-effect/src/test/TSCode.ts",
+  "fileType": "ts",
+  "moduleSpecifiers": [],
+  "declareVars": [
+    {
+      "dependencies": [],
+      "name": "emits",
+      "type": "var",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "0fb5bbf16e6d595409c97c747a353552383062afbefe97082544b24efda21fbe"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [],
+          "name": "emits",
+          "type": "var",
+          "isExported": false,
+          "isImported": false,
+          "isTsType": false,
+          "astHash": "0fb5bbf16e6d595409c97c747a353552383062afbefe97082544b24efda21fbe"
+        }
+      ],
+      "name": "onSearch",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "7eb4cb8563ca4ddbaccd9948df5c59114206e3b965e2533b1915f215b649de32"
+    }
+  ]
+}

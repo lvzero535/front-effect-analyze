@@ -1,0 +1,175 @@
+{
+  "path": "E:/DevPrograms/CodeRepository/dev-products/project-modify-effect/src/test/VueCode.vue",
+  "fileType": "vue",
+  "moduleSpecifiers": [
+    "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+  ],
+  "declareVars": [
+    {
+      "dependencies": [],
+      "name": "Form",
+      "type": "const",
+      "isExported": false,
+      "isImported": true,
+      "isTsType": false,
+      "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+      "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+    },
+    {
+      "dependencies": [],
+      "name": "searchContent",
+      "type": "var",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "a60eba7ac2a41690cc72f2bf2f9187f3ddc8a475d31a815fe6456fed39d7916e"
+    },
+    {
+      "dependencies": [],
+      "name": "isAdmin",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "0193d68f2c7cf2eccb066d4eb566125a0ca41893bee0bdddde027065208665f8"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [
+            {
+              "dependencies": [],
+              "name": "Form",
+              "type": "const",
+              "isExported": false,
+              "isImported": true,
+              "isTsType": false,
+              "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+              "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+            },
+            {
+              "dependencies": [],
+              "name": "Form",
+              "type": "const",
+              "isExported": false,
+              "isImported": true,
+              "isTsType": false,
+              "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+              "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+            }
+          ],
+          "name": "openRoleModal",
+          "type": "function",
+          "isExported": false,
+          "isImported": false,
+          "isTsType": false,
+          "astHash": "0c65d84b45f8b94e0f851536e8980ee7b835235e18f915c45b7608ed0a661bba"
+        }
+      ],
+      "name": "addRoleHandler",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "75f2e1f4c63075d7de5b7d78b50b3d24cc8fa2b4d5882fb78731d8031fb21be1"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [
+            {
+              "dependencies": [],
+              "name": "Form",
+              "type": "const",
+              "isExported": false,
+              "isImported": true,
+              "isTsType": false,
+              "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+              "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+            },
+            {
+              "dependencies": [],
+              "name": "Form",
+              "type": "const",
+              "isExported": false,
+              "isImported": true,
+              "isTsType": false,
+              "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+              "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+            }
+          ],
+          "name": "openRoleModal",
+          "type": "function",
+          "isExported": false,
+          "isImported": false,
+          "isTsType": false,
+          "astHash": "0c65d84b45f8b94e0f851536e8980ee7b835235e18f915c45b7608ed0a661bba"
+        }
+      ],
+      "name": "editRoleHandler",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "ae2adc250c8ed82b559124b2a4bfbfa187f533a09ae576d219dcb566d69e30b0"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [],
+          "name": "Form",
+          "type": "const",
+          "isExported": false,
+          "isImported": true,
+          "isTsType": false,
+          "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+          "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+        },
+        {
+          "dependencies": [],
+          "name": "Form",
+          "type": "const",
+          "isExported": false,
+          "isImported": true,
+          "isTsType": false,
+          "astHash": "cee545e588fc21df8823411cb60ce49ef60f8f35d9177db2bd02c537e787edb5",
+          "moduleSpecifier": "E:\\DevPrograms\\CodeRepository\\dev-products\\project-modify-effect\\src\\test\\Form.vue"
+        }
+      ],
+      "name": "openRoleModal",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "0c65d84b45f8b94e0f851536e8980ee7b835235e18f915c45b7608ed0a661bba"
+    },
+    {
+      "dependencies": [],
+      "name": "onDelete",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "96e2434ad58fafc46e1e584dfcd9f9d10c5ace978447754ee382b26ba4b09e68"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [],
+          "name": "searchContent",
+          "type": "var",
+          "isExported": false,
+          "isImported": false,
+          "isTsType": false,
+          "astHash": "a60eba7ac2a41690cc72f2bf2f9187f3ddc8a475d31a815fe6456fed39d7916e"
+        }
+      ],
+      "name": "getRoleData",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "e986fa8d4b1488d38c271849db301136bacb79a5031e233d46a94136a76efc31"
+    }
+  ]
+}

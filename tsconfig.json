@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* 基本选项 */
+    "target": "ES6",                          /* 指定 ECMAScript 目标版本。 */
+    "module": "ESNext",                       /* 指定模块代码生成。 */
+    "lib": ["ES6", "DOM"],                    /* 指定要包含在编译中的库文件。 */
+    "outDir": "./dist",                       /* 重定向输出目录。 */
+    "rootDir": "./src",                       /* 用于指定输入文件的根目录。 */
+    "strict": true,                           /* 启用所有严格类型检查选项。 */
+    "esModuleInterop": true,                  /* 通过为导入内容创建命名空间对象，实现 CommonJS 和 ES 模块之间的互操作性。 */
+    "skipLibCheck": true,                     /* 跳过所有 .d.ts 文件的类型检查。 */
+    "forceConsistentCasingInFileNames": true, /* 禁止对同一个文件使用不一致的大小写引用。 */
+
+    /* 模块解析选项 */
+    "moduleResolution": "node",               /* 指定模块解析策略。 */
+    "baseUrl": ".",                           /* 用于解析非相对模块名称的基目录。 */
+    "paths": {                                /* 模块名到基于 baseUrl 的路径映射的列表。 */
+      "@/*": ["src/*"]
+    },
+    "allowSyntheticDefaultImports": true,     /* 允许从没有默认导出的模块中默认导入。 */
+
+    /* Source Map 选项 */
+    "sourceMap": true,                        /* 生成相应的 .map 文件。 */
+    "inlineSources": true,                    /* 将代码与 sourcemaps 内联。 */
+
+    /* 实验性功能 */
+    "experimentalDecorators": true,           /* 启用实验性的 ES 装饰器。 */
+    "emitDecoratorMetadata": true             /* 为装饰器提供元数据支持。 */
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/test/VueCode.vue", "src/test/JSCode.js"], /* 要包含在编译中的文件或文件夹。 */
+  "exclude": ["node_modules", "dist"]         /* 要排除在编译之外的文件或文件夹。 */
+}

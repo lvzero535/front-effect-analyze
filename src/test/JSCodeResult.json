@@ -1,0 +1,45 @@
+{
+  "path": "E:/DevPrograms/CodeRepository/dev-products/project-modify-effect/src/test/JSCode.js",
+  "fileType": "js",
+  "moduleSpecifiers": [],
+  "declareVars": [
+    {
+      "dependencies": [],
+      "name": "count",
+      "type": "var",
+      "isExported": true,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [],
+          "name": "count",
+          "type": "var",
+          "isExported": true,
+          "isImported": false,
+          "isTsType": false,
+          "astHash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+        }
+      ],
+      "name": "test",
+      "type": "function",
+      "isExported": true,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "fe5574bb4b2636204faeb527312807126f01b87c9321acf1fbd2f8b3fc797808"
+    },
+    {
+      "dependencies": [],
+      "name": "sortArray",
+      "type": "function",
+      "isExported": false,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "6d908deb7d577b78d4f5e48e8ed2b1a26778f6bddaeca7b6ac58dd165c714098"
+    }
+  ],
+  "parentModules": []
+}
