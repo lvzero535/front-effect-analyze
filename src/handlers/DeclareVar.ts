@@ -1,4 +1,4 @@
-import { IDeclareVar, VarType } from './types';
+import type { IDeclareVar, VarType } from './types.js';
 
 export class DeclareVar implements IDeclareVar {
   name: string;

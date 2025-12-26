@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "tsx src/exec.ts",
+    "start": "pnpm run worker:dev",
+    "worker:exe": "node dist/exec.js",
+    "worker:dev": "pnpm run build && node dist/exec.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
   },

@@ -1,18 +1,12 @@
-import { Result } from "./analyze";
-import type { FileAnalyzeResult, IDeclareVar } from "./handlers/types";
-import { getCommonElements, hasCommonElement } from "./helper";
+import type { FileAnalyzeResult, IDeclareVar } from "./handlers/types.js";
+import { getCommonElements } from "./helper.js";
+import type { EffectResult, Result } from "./types.js";
 
 type DiffType = 'add' | 'change' | 'remove';
 type DiffDeclareVar = IDeclareVar & { diffType: DiffType };
 
-export interface EffectResult {
-  path: string;
-  effectPaths: { name: string; paths: string[] }[];
-}
-
 /**
  * 
- * 帮我编写这个findDiffDependencies函数，根据oldFile.declareVars和newFile.declareVars
  * 1. 新增的依赖变量
  * 2. 变化的依赖变量（astHash不同）
  * 3. 移除的依赖变量（在newFile.declareVars中不存在）

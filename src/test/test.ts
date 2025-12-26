@@ -81,3 +81,22 @@ console.log(JSON.stringify(result, null, 2))
 
 
  */
+
+
+
+async function test(id: string) {
+  return id;
+}
+
+async function test1(ids: string[]) {
+  const results: string[] = [];
+  for (const id of ids) {
+    results.push(await test(id));
+  }
+  return results;
+}
+
+async function test2(ids: string[]) {
+  const results = await Promise.all(ids.map((id) => test(id)));
+  return results;
+}

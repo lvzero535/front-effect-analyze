@@ -1,120 +1,59 @@
-import path from "path";
-import { analyzeTsFile } from "./handlers/handleTs";
-import { FileAnalyzeResult } from "./handlers/types";
-import { handleVue } from "./handlers/handleVue";
-import { isFileExist } from "./files";
-import { resultToTree } from "./helper";
-
+import type { FileAnalyzeResult } from "./handlers/types.js";
+import { asyncAnalyzeFile } from "./handlers/index.js";
+import { workerAnalyzeFile } from "./worker/main.js";
+import type { IAnalyzeOptions, ICompilerOptions, Result } from "./types.js";
 
 /**
  * 分析项目根目录下的所有文件
  */
-export interface AnalyzeOptions {
-  tsconfigJson: Record<string, any>;
-  packageJson: Record<string, any>;
-  files: string[];
+
+
+
+async function syncAnalyzeFile(allFiles: string[], compilerOptions: ICompilerOptions, dependencies: string[]) {
+  const results: Result = new Map();
+
+  function saveResults(filePath: string, result: FileAnalyzeResult) {
+    results.set(filePath, result);
+    console.log('已分析文件/总文件', results.size, allFiles.length);
+    if (results.size === allFiles.length) {
+      console.log('分析完成');
+    }
+  }
+
+  await Promise.all(allFiles.map(async (filePath) => {
+    const result = await asyncAnalyzeFile(filePath, compilerOptions, dependencies);
+    saveResults(filePath, result);
+  }));
+
+  return results;
 }
 
-export type Result = Map<string, FileAnalyzeResult>;
 
-export class Analyze {
-  tsconfigJson: Record<string, any> = {};
-  packageJson: Record<string, any> = {};
-  allFiles: string[] = [];
-  results: Result = new Map();
-  success: (result: Result) => void = () => {};
 
-  constructor(options: AnalyzeOptions, success: (result: Result) => void = () => {}) {
-    this.tsconfigJson = options.tsconfigJson;
-    this.packageJson = options.packageJson;
-    this.allFiles = options.files;
-    this.success = success;
-    this.analyzeFiles();
+
+export async function analyzeFiles(options: IAnalyzeOptions): Promise<Result> {
+  const { 
+    compilerOptions, 
+    files, 
+    dependencies = [],
+    enableWorker = false,
+  } = options;
+  let results: Result = new Map();
+
+  if (!files.length) {
+    console.log('请输入要分析的文件路径');
+    return results;
   }
 
-  analyzeFiles() {
-    // web worker
-    for (const filePath of this.allFiles) {
-      if (!isFileExist(filePath)) {
-        this.saveResults(filePath, {
-          path: filePath,
-          fileType: 'ts',
-          moduleSpecifiers: [],
-          declareVars: [],
-          parentModules: [],
-          notExist: true,
-        });
-        continue;
-      }
-      const ext = path.extname(filePath);
-      switch (ext) {
-        case ".ts":
-        case ".tsx":
-          this.analyzeTsFile(filePath);
-          break;
-        case ".js":
-        case ".jsx":
-          this.analyzeJsFile(filePath);
-          break;
-        case ".vue":
-          this.analyzeVueFile(filePath);
-          break;
-        default:
-          break;
-      }
-    }
+  const start = performance.now();
+  if (enableWorker) {
+    results = await workerAnalyzeFile(files, compilerOptions, dependencies);
+    const end = performance.now();
+    console.log(`⏱️  Worker analyze ${files.length} files in ${end - start} ms`)
+  } else {
+    results = await syncAnalyzeFile(files, compilerOptions, dependencies);
+    const end = performance.now();
+    console.log(`⏱️  Sync analyze ${files.length} files in ${end - start} ms`)
   }
-
-  saveResults(filePath: string, result: FileAnalyzeResult) {
-    this.results.set(filePath, result);
-    console.log('已分析文件/总文件', this.results.size, this.allFiles.length);
-    if (this.results.size === this.allFiles.length) {
-      console.log('分析完成');
-      resultToTree(this.results);
-      this.success(this.results);
-    }
-  }
-
-  private async analyzeTsFile(filePath: string) {
-    const result = await analyzeTsFile(filePath, this.tsconfigJson.compilerOptions, this.dependencies);
-    this.saveResults(filePath, result);
-  }
-
-  private analyzeJsFile(filePath: string) {
-    console.log("analyzeJsFile", filePath);
-  }
-
-  private async analyzeVueFile(filePath: string) {
-    const result = await handleVue(filePath, this.tsconfigJson.compilerOptions, this.dependencies);
-    if (result) {
-      this.saveResults(filePath, result);
-    } else {
-      console.log('分析vue文件失败', filePath);
-      this.saveResults(filePath, {
-        path: filePath,
-        fileType: 'vue',
-        moduleSpecifiers: [],
-        declareVars: [],
-        parentModules: [],
-      });
-    }
-
-  }
-
-  get dependencies(): string[] {
-    return Object.keys( {
-      ...(this.packageJson["dependencies"] || {}),
-      ...(this.packageJson["devDependencies"] || {}),
-      ...(this.packageJson["peerDependencies"] || {}),
-    });
-  }
-
-  get baseUrl() {
-    return this.tsconfigJson.compilerOptions?.baseUrl || "";
-  }
-
-  get paths() {
-    return this.tsconfigJson.compilerOptions?.paths || {};
-  }
-
+  return results;
 }

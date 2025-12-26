@@ -1,8 +1,8 @@
 import * as crypto from 'crypto';
 import ts from "typescript";
-import { IDeclareVar, VarType } from "./types";
-import { DeclareVar } from "./DeclareVar";
-import { resolveModuleSpecifier } from "./resolveModuleSpecifier";
+import type { IDeclareVar, VarType } from "./types.js";
+import { DeclareVar } from "./DeclareVar.js";
+import { resolveModuleSpecifier } from "./resolveModuleSpecifier.js";
 
 export function handleImportDeclaration(
   node: ts.ImportDeclaration,

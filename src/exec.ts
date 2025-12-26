@@ -1,4 +1,4 @@
-import { start } from "./index";
+import { start } from "./index.js";
 
 start({
   projectRoot: "E:/DevPrograms/CodeRepository/dev-products/nest-vue-app/nest-vue-web",
@@ -18,4 +18,5 @@ start({
     fileName: "result.json",
   },
   isFullAnalyze: false,
+  enableWorker: true,
 });

@@ -82,6 +82,3 @@ export interface FileAnalyzeResult {
    */
   parentModules: string[];
 }
-
-
-export interface ITsConfig { baseUrl?: string; paths: Record<string, string[]> }

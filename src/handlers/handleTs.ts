@@ -1,13 +1,14 @@
 // tsFileAnalyzer.ts（完整更新版）
 import * as ts from 'typescript';
 import * as path from 'path';
-import { IDeclareVar, FileAnalyzeResult, VarType, ITsConfig } from './types';
-import { getFileContent } from '@/files';
-import { handleImportDeclaration, printAstTree, getNodeNormalizedHash,getVarType, isTsTypeNodeKind } from './helper';
-import { resolveModuleSpecifier } from './resolveModuleSpecifier';
-import { DeclareVar } from './DeclareVar';
+import type { IDeclareVar, FileAnalyzeResult, VarType } from './types.js';
+import { getFileContent } from '../files.js';
+import { handleImportDeclaration, getNodeNormalizedHash,getVarType, isTsTypeNodeKind } from './helper.js';
+import { resolveModuleSpecifier } from './resolveModuleSpecifier.js';
+import { DeclareVar } from './DeclareVar.js';
 
-import { parse, compileTemplate, compileScript, registerTS } from "@vue/compiler-sfc";
+import { parse, registerTS } from "@vue/compiler-sfc";
+import type { ICompilerOptions } from '../types.js';
 
 async function getSourceFile(filePath: string): Promise<ts.SourceFile> {
   const sourceCode = await getFileContent(filePath);
@@ -33,7 +34,7 @@ async function getSourceFile(filePath: string): Promise<ts.SourceFile> {
 
 export async function analyzeTsFile(
   filePath: string,
-  tsconfig: ITsConfig,
+  tsconfig: ICompilerOptions,
   installDeps: string[] = []): Promise<FileAnalyzeResult> {
 
   // const sourceCode = await getFileContent(filePath);

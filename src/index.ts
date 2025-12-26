@@ -1,9 +1,9 @@
 import path from "path";
-import {Analyze, Result} from "./analyze";
-import { getAnalyzeJson, resultToTree, saveAnalyzeJson, saveResultJson } from "./helper";
-import { loadProjectFiles } from "./projectFiles";
-import { diffAnalyzeJson } from "./diff";
-import { IOptions } from "./types";
+import { analyzeFiles } from "./analyze.js";
+import { getAnalyzeJson, getDependencies, resultToTree, saveAnalyzeJson, saveResultJson } from "./helper.js";
+import { loadProjectFiles } from "./projectFiles.js";
+import { diffAnalyzeJson } from "./diff.js";
+import type { IOptions, IAnalyzeOptions, Result } from "./types.js";
 
 function normalizeOptions(options: IOptions) {
   const { projectRoot, analyzeJsonFile, resultJsonFile, isFullAnalyze = true, fileOps } = options;
@@ -35,50 +35,59 @@ export async function start(options: IOptions) {
 
   const projectFiles = await loadProjectFiles(projectRoot, fileOps);
 
-  let analyzedJson: Result = new Map();
+  const analyzeOptions: IAnalyzeOptions = {
+    enableWorker: options.enableWorker,
+    files: projectFiles.files,
+    compilerOptions: projectFiles.tsconfigJson.compilerOptions || {},
+    dependencies: getDependencies(projectFiles.packageJson),
+  }
 
   if (isFullAnalyze) {
     // 全量分析
-    new Analyze(projectFiles, (results) => {
-      analyzedJson = results;
-      saveAnalyzeJson(analyzeJsonFile, Array.from(results.values()));
-    });
+    const results = await analyzeFiles(analyzeOptions);
+    resultToTree(results);
+    saveAnalyzeJson(analyzeJsonFile, Array.from(results.values()));
     return; // 全量分析完成后，返回
-  } else {
-    analyzedJson = await getAnalyzeJson(analyzeJsonFile);
   }
 
+  
   const filteredModifiedFiles = modifiedFiles.filter(file => fileOps.includeExtensions.includes(path.extname(file)));
 
-  // 增量分析，只分析modifyFiles中的文件
-  filteredModifiedFiles.length && new Analyze({
-    ...projectFiles,
-    files: filteredModifiedFiles,
-  }, (results) => {
+  if (!filteredModifiedFiles.length) {
+    console.log('增量分析文件为空，返回');
+    return; // 增量分析文件为空，返回
+  }
 
-    const tempResult: Result = new Map();
+  analyzeOptions.files = filteredModifiedFiles;
 
-    // 合并增量分析结果和全量分析结果
-    for (const [filePath, result] of analyzedJson) {
-      // 增量分析结果中没有的文件，直接使用全量分析结果
-      if (results.has(filePath)) {
-        tempResult.set(filePath, results.get(filePath)!);
-      } else {
-        tempResult.set(filePath, result);
-      }
+  const modifiedResults = await analyzeFiles(analyzeOptions);
+
+  const tempResult: Result = new Map();
+
+  // 全量分析的内容，增量分析时需要使用
+  const analyzedJson = await getAnalyzeJson(analyzeJsonFile);
+
+  // 合并增量分析结果和全量分析结果
+  for (const [filePath, result] of analyzedJson) {
+    // 增量分析结果中没有的文件，直接使用全量分析结果
+    if (modifiedResults.has(filePath)) {
+      tempResult.set(filePath, modifiedResults.get(filePath)!);
+    } else {
+      tempResult.set(filePath, result);
     }
+  }
 
-    resultToTree(tempResult);
+  // 增量分析结果，收集依赖
+  resultToTree(tempResult);
 
-    for (const [filePath] of results) {
-      results.set(filePath, tempResult.get(filePath)!);
-    }
+  for (const [filePath] of modifiedResults) {
+    modifiedResults.set(filePath, tempResult.get(filePath)!);
+  }
 
-    const { analyzeJson, result } = diffAnalyzeJson(analyzedJson, results);
+  const { analyzeJson, result } = diffAnalyzeJson(analyzedJson, modifiedResults);
 
-    // 分析后，重新保存diffJson
-    saveAnalyzeJson(analyzeJsonFile, Array.from(analyzeJson.values()));
-    saveResultJson(resultJsonFile, Array.from(result.values()));
-  });
+  // 分析后，重新保存diffJson
+  saveAnalyzeJson(analyzeJsonFile, Array.from(analyzeJson.values()));
+  saveResultJson(resultJsonFile, Array.from(result.values()));
 
 }

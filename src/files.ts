@@ -19,12 +19,7 @@
  */
 import { promises as fs, existsSync } from "fs";
 import path from "path";
-
-export interface TraverseOptions {
-  excludeExtensions?: string[];
-  excludeDirs?: string[];
-  includeExtensions?: string[];
-}
+import { TraverseOptions } from "./types.js";
 
 export async function traverseFiles(
   dirPath: string,

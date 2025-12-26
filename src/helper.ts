@@ -1,10 +1,8 @@
 import path from "path";
-import { FileAnalyzeResult } from "./handlers/types";
+import type { FileAnalyzeResult } from "./handlers/types.js";
 import fs from "fs";
-import { getFileContent, writeFileContent } from "./files";
-import { Result } from "./analyze";
-import { EffectResult } from "./diff";
-import { JsonFileSaveOptions } from "./types";
+import { getFileContent, writeFileContent } from "./files.js";
+import type { JsonFileSaveOptions, EffectResult, Result } from "./types.js";
 
 export function jsonToString(json: any, indent = 2): string {
   return JSON.stringify(json, null, indent);
@@ -67,4 +65,13 @@ export function resultToTree(results: Result) {
         }
       });
     }
+}
+
+
+export function getDependencies(packageJson: Record<string, any>) {
+  return Object.keys( {
+      ...(packageJson["dependencies"] || {}),
+      ...(packageJson["devDependencies"] || {}),
+      ...(packageJson["peerDependencies"] || {}),
+    });
 }

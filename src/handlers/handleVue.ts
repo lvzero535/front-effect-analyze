@@ -1,11 +1,11 @@
 import { parse, compileTemplate, compileScript, registerTS } from "@vue/compiler-sfc";
-import { getFileContent } from "@/files";
-import ts from "typescript";
-import { ITsConfig } from "./types";
-import { analyzeTsFile } from "./handleTs";
+import { getFileContent } from "../files.js";
+import type { FileAnalyzeResult } from "./types.js";
+import { analyzeTsFile } from "./handleTs.js";
+import type { ICompilerOptions } from "../types.js";
 
 
-export async function handleVue(path: string, tsConfig: ITsConfig, installDeps: string[] = []) {
+export async function handleVue(path: string, tsConfig: ICompilerOptions, installDeps: string[] = []): Promise<FileAnalyzeResult> {
   const code = await getFileContent(path);
   const parsed = parse(code);
   if (parsed.descriptor.template) {
@@ -29,6 +29,13 @@ export async function handleVue(path: string, tsConfig: ITsConfig, installDeps: 
     // console.log(sourceFile)
     const result = await analyzeTsFile(path, tsConfig, installDeps);
     return result;
-  }
+  };
+  return {
+    path,
+    fileType: 'vue',
+    moduleSpecifiers: [],
+    declareVars: [],
+    parentModules: [],
+  };
 }
 

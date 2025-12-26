@@ -1,6 +1,5 @@
 import path from "path";
-import { getFileContent, traverseFiles } from "./files";
-import { AnalyzeOptions } from "./analyze";
+import { getFileContent, traverseFiles } from "./files.js";
 import { ProjectFilesOptions } from "./types";
 
  async function getTsconfigConfig(projectRoot:string, tsconfigFileName: string) {
@@ -17,7 +16,7 @@ async function getPackageConfig(projectRoot: string) {
   return packageJson;
 }
 
-export async function loadProjectFiles(projectRoot: string, options: ProjectFilesOptions = {}): Promise<AnalyzeOptions> {
+export async function loadProjectFiles(projectRoot: string, options: ProjectFilesOptions = {}) {
   const {
     tsconfigFileName = "tsconfig.json",
     isTraverseFile = true,

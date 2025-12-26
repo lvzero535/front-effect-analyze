@@ -1,4 +1,15 @@
-import { TraverseOptions } from "./files";
+import type { FileAnalyzeResult } from "./handlers/types.js";
+
+export interface TraverseOptions {
+  excludeExtensions?: string[];
+  excludeDirs?: string[];
+  includeExtensions?: string[];
+}
+
+export interface ICompilerOptions { 
+  baseUrl?: string; 
+  paths: Record<string, string[]>;
+}
 
 export interface ProjectFilesOptions extends TraverseOptions {
   tsconfigFileName?: string;
@@ -26,4 +37,19 @@ export interface IOptions {
   modifiedFiles?: string[];
   /** 是否全量分析 */
   isFullAnalyze?: boolean;
+  /** 是否启用Worker线程 */
+  enableWorker?: boolean;
+}
+
+export interface EffectResult {
+  path: string;
+  effectPaths: { name: string; paths: string[] }[];
+}
+
+export type Result = Map<string, FileAnalyzeResult>;
+export interface IAnalyzeOptions {
+  compilerOptions: ICompilerOptions;
+  files: string[];
+  dependencies: string[];
+  enableWorker?: boolean;
 }
