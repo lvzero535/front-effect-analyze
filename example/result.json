@@ -1,0 +1,35 @@
+[
+  {
+    "path": "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\utils\\tree.ts",
+    "effectPaths": [
+      {
+        "name": "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\menu\\index.vue",
+        "paths": [
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\utils\\tree.ts",
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\menu\\Form.vue",
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\menu\\index.vue"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\api\\role\\index.ts",
+    "effectPaths": [
+      {
+        "name": "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\role\\index.vue",
+        "paths": [
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\api\\role\\index.ts",
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\role\\index.vue"
+        ]
+      },
+      {
+        "name": "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\user\\index.vue",
+        "paths": [
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\api\\role\\index.ts",
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\user\\Form.vue",
+          "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\views\\system\\user\\index.vue"
+        ]
+      }
+    ]
+  }
+]

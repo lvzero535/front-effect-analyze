@@ -17,7 +17,7 @@
  *   excludeDirs: ['node_modules']
  * });
  */
-import { promises as fs } from "fs";
+import { promises as fs, existsSync } from "fs";
 import path from "path";
 
 export interface TraverseOptions {
@@ -76,4 +76,12 @@ export async function writeFileContent(filePath: string, content: string): Promi
     console.error(`写入文件 ${filePath} 时出错:`, error);
     throw error;
   }
+}
+
+export function isFileExist(filePath: string): boolean {
+  return existsSync(filePath);
+}
+
+export function getPath(paths: string[]): string {
+  return path.resolve(...paths);
 }

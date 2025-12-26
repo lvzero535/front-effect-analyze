@@ -3,9 +3,8 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import { IDeclareVar, FileAnalyzeResult, VarType, ITsConfig } from './types';
 import { getFileContent } from '@/files';
-import { handleImportDeclaration, printAstTree, getVarType, isTsTypeNodeKind } from './helper';
+import { handleImportDeclaration, printAstTree, getNodeNormalizedHash,getVarType, isTsTypeNodeKind } from './helper';
 import { resolveModuleSpecifier } from './resolveModuleSpecifier';
-import { getNodeNormalizedHash } from './diffNode';
 import { DeclareVar } from './DeclareVar';
 
 import { parse, compileTemplate, compileScript, registerTS } from "@vue/compiler-sfc";

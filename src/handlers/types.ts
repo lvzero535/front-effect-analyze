@@ -54,6 +54,9 @@ export interface IDeclareVar {
  * 文件分析结果
  */
 export interface FileAnalyzeResult {
+
+  notExist?: boolean;
+
   /**
    * 当前文件路径
    */
