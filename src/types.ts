@@ -1,14 +1,10 @@
+import ts from "typescript";
 import type { FileAnalyzeResult } from "./handlers/types.js";
 
 export interface TraverseOptions {
   excludeExtensions?: string[];
   excludeDirs?: string[];
   includeExtensions?: string[];
-}
-
-export interface ICompilerOptions { 
-  baseUrl?: string; 
-  paths: Record<string, string[]>;
 }
 
 export interface ProjectFilesOptions extends TraverseOptions {
@@ -27,8 +23,10 @@ export interface JsonFileSaveOptions {
 export interface IOptions {
   /** 项目根目录 */
   projectRoot: string;
+  /** TSConfig文件名, 默认为tsconfig.json */
+  tsconfigFileName?: string;
   /** 项目文件操作选项 */
-  fileOps?: ProjectFilesOptions;
+  fileOps?: TraverseOptions;
   /** 分析结果JSON文件选项 */
   analyzeJsonFile?: JsonFileSaveOptions;
   /** 结果JSON文件选项 */
@@ -47,9 +45,22 @@ export interface EffectResult {
 }
 
 export type Result = Map<string, FileAnalyzeResult>;
+
+export interface ICompilerOptions { 
+  baseUrl?: string; 
+  paths: Record<string, string[]>;
+}
+
 export interface IAnalyzeOptions {
-  compilerOptions: ICompilerOptions;
+  projectRoot: string;
   files: string[];
-  dependencies: string[];
   enableWorker?: boolean;
+}
+
+export interface IAnalyzeAstOptions {
+  filePath: string;
+  sourceFile: ts.SourceFile;
+  checker: ts.TypeChecker;
+  compilerOptions: ts.CompilerOptions;
+  dependencies: string[];
 }

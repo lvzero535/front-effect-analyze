@@ -5,31 +5,32 @@
   "declareVars": [
     {
       "dependencies": [],
-      "name": "emits",
+      "name": "count",
       "type": "var",
-      "isExported": false,
+      "isExported": true,
       "isImported": false,
       "isTsType": false,
-      "astHash": "0fb5bbf16e6d595409c97c747a353552383062afbefe97082544b24efda21fbe"
+      "astHash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
     },
     {
       "dependencies": [
         {
           "dependencies": [],
-          "name": "emits",
+          "name": "count",
           "type": "var",
-          "isExported": false,
+          "isExported": true,
           "isImported": false,
           "isTsType": false,
-          "astHash": "0fb5bbf16e6d595409c97c747a353552383062afbefe97082544b24efda21fbe"
+          "astHash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
         }
       ],
-      "name": "onSearch",
+      "name": "test",
       "type": "function",
-      "isExported": false,
+      "isExported": true,
       "isImported": false,
       "isTsType": false,
-      "astHash": "7eb4cb8563ca4ddbaccd9948df5c59114206e3b965e2533b1915f215b649de32"
+      "astHash": "c54a55067e9eab37ba122a670bab8f44b4f0e89d4e6ddcc55a8f941606e3fa77"
     }
-  ]
+  ],
+  "parentModules": []
 }

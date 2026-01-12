@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "pnpm run worker:dev",
+    "dev": "pnpm run worker:dev",
     "worker:exe": "node dist/exec.js",
     "worker:dev": "pnpm run build && node dist/exec.js",
     "test": "echo \"Error: no test specified\" && exit 1",

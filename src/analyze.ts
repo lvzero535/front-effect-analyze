@@ -9,7 +9,7 @@ import type { IAnalyzeOptions, ICompilerOptions, Result } from "./types.js";
 
 
 
-async function syncAnalyzeFile(allFiles: string[], compilerOptions: ICompilerOptions, dependencies: string[]) {
+async function syncAnalyzeFile(allFiles: string[], projectRoot: string) {
   const results: Result = new Map();
 
   function saveResults(filePath: string, result: FileAnalyzeResult) {
@@ -21,7 +21,7 @@ async function syncAnalyzeFile(allFiles: string[], compilerOptions: ICompilerOpt
   }
 
   await Promise.all(allFiles.map(async (filePath) => {
-    const result = await asyncAnalyzeFile(filePath, compilerOptions, dependencies);
+    const result = await asyncAnalyzeFile(filePath, projectRoot);
     saveResults(filePath, result);
   }));
 
@@ -31,13 +31,11 @@ async function syncAnalyzeFile(allFiles: string[], compilerOptions: ICompilerOpt
 
 
 
-export async function analyzeFiles(options: IAnalyzeOptions): Promise<Result> {
-  const { 
-    compilerOptions, 
-    files, 
-    dependencies = [],
-    enableWorker = false,
-  } = options;
+export async function analyzeFiles({
+  projectRoot = '',
+  enableWorker = false,
+  files = [],
+}: IAnalyzeOptions): Promise<Result> {
   let results: Result = new Map();
 
   if (!files.length) {
@@ -47,11 +45,11 @@ export async function analyzeFiles(options: IAnalyzeOptions): Promise<Result> {
 
   const start = performance.now();
   if (enableWorker) {
-    results = await workerAnalyzeFile(files, compilerOptions, dependencies);
+    results = await workerAnalyzeFile(files, projectRoot);
     const end = performance.now();
     console.log(`⏱️  Worker analyze ${files.length} files in ${end - start} ms`)
   } else {
-    results = await syncAnalyzeFile(files, compilerOptions, dependencies);
+    results = await syncAnalyzeFile(files, projectRoot);
     const end = performance.now();
     console.log(`⏱️  Sync analyze ${files.length} files in ${end - start} ms`)
   }

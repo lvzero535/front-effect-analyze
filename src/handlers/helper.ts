@@ -6,7 +6,7 @@ import { resolveModuleSpecifier } from "./resolveModuleSpecifier.js";
 
 export function handleImportDeclaration(
   node: ts.ImportDeclaration,
-  tsconfig: { baseUrl?: string; paths: Record<string, string[]> },
+  tsconfig: ts.CompilerOptions,
   currentFileDir: string,
   installDeps: string[]): IDeclareVar[] {
 
@@ -29,6 +29,7 @@ export function handleImportDeclaration(
       isExported: false,
       isImported: true,
       moduleSpecifier: importPath,
+      astNode: importClause.name,
     }));
   }
 
@@ -40,6 +41,7 @@ export function handleImportDeclaration(
       isExported: false,
       isImported: true,
       moduleSpecifier: importPath,
+      astNode: importClause.namedBindings.name,
     }));
   }
 
@@ -53,6 +55,7 @@ export function handleImportDeclaration(
         isExported: false,
         isImported: true,
         moduleSpecifier: importPath,
+        astNode: element.name,
       }));
     });
   }
@@ -163,7 +166,6 @@ export function getNodeNormalizedHash(
     omitTrailingSemicolon: true,
     noEmitHelpers: true,
   });
-
   // 打印节点的规范化代码（EmitHint.Unspecified 表示打印完整节点）
   const normalizedCode = printer.printNode(ts.EmitHint.Unspecified, node, sourceFile).trim();
 

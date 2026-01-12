@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
+import ts from "typescript";
 
 interface TsConfig {
   compilerOptions?: {
@@ -42,7 +43,7 @@ const innerDeps = [
  */
 export function resolveModuleSpecifier(
   moduleSpecifier: string,
-  tsconfig: { baseUrl?: string; paths: Record<string, string[]> },
+  tsconfig: ts.CompilerOptions,
   currentFileDir: string,
   installDeps: string[]
 ): string {

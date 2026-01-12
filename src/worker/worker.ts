@@ -8,14 +8,14 @@ if (isMainThread || !parentPort) {
   throw new Error('Not in worker thread')
 }
 
-const { compilerOptions, dependencies } = workerData;
+const { projectRoot } = workerData;
 
 parentPort.on('message', async (msg) => {
   if (msg.type === 'TASK') {
 
     const { filePath, outDir } = msg;
 
-    const results = await asyncAnalyzeFile(filePath, compilerOptions, dependencies);
+    const results = await asyncAnalyzeFile(filePath, projectRoot);
     
     console.log(`Analyzing file: ${outDir} ==>`);
 

@@ -1,3 +1,5 @@
+import ts from "typescript";
+
 export type VarType = 'function' | 'class' | 'const' | 'let' | 'var' | 'interface' | 'type' | 'enum';
 
 /**
@@ -14,6 +16,11 @@ export interface IDeclareVar {
    * 变量的ast hash值，用于前后后比较是否发生变化
    */
   astHash?: string;
+
+  /**
+   * 变量在 AST 中的节点, 用于checker后续分析变化
+   */
+  astNode?: ts.Node;
 
   /**
    * 变量的类型, 如 function, class, const 等
@@ -65,7 +72,7 @@ export interface FileAnalyzeResult {
   /**
    * 文件类型
    */
-  fileType: 'ts' | 'js' | 'vue';
+  fileType?: 'ts' | 'js' | 'vue';
 
   /**
    * 文件依赖的其他文件路径

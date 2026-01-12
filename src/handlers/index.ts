@@ -1,18 +1,20 @@
 import path from "path";
 import { analyzeTsFile } from "./handleTs.js";
-import { handleVue } from "./handleVue.js";
 import type { FileAnalyzeResult } from "./types.js";
 import { isFileExist } from "../files.js";
-import type { ICompilerOptions } from "../types.js";
+import { ProjectProgram } from "../ProjectProgram.js";
+import ts from "typescript";
+import { getVueSourceFile } from "./handleVue.js";
+
+
 
 export async function asyncAnalyzeFile(
   filePath: string,
-  compilerOptions: ICompilerOptions,
-  dependencies: string[]
+  projectRoot: string,
 ): Promise<FileAnalyzeResult> {
 
   if (!isFileExist(filePath)) {
-    return{
+    return {
       path: filePath,
       fileType: 'ts',
       moduleSpecifiers: [],
@@ -20,23 +22,41 @@ export async function asyncAnalyzeFile(
       parentModules: [],
       notExist: true,
     };
-  } 
+  }
 
+  const program = await ProjectProgram.getInstance(projectRoot);
   let result: FileAnalyzeResult | undefined;
   const ext = path.extname(filePath);
 
   switch (ext) {
     case ".ts":
     case ".tsx":
-      result = await analyzeTsFile(filePath , compilerOptions, dependencies);
-      break;
     case ".js":
-    case ".jsx":
-      result = await analyzeTsFile(filePath, compilerOptions, dependencies);
+    case ".jsx": {
+      const analyzeOptions = program.getAnalyzeOptions(filePath);
+      result = await analyzeTsFile(analyzeOptions);
       break;
-    case ".vue":
-      result = await handleVue(filePath, compilerOptions, dependencies);
+    }
+    case ".vue": {
+      const sourceFile = await getVueSourceFile(filePath);
+      if (!sourceFile) {
+        break;
+      }
+      const analyzeOptions = program.getAnalyzeOptions(
+          filePath,
+          () => sourceFile,
+          (filePath, compilerOptions) => {
+            const program = ts.createProgram({
+              rootNames: [filePath],
+              options: compilerOptions,
+            });
+            const checker = program.getTypeChecker();
+            return checker;
+          }
+        );
+      result = await analyzeTsFile(analyzeOptions);
       break;
+    }
     default:
       result = undefined;
       break;
@@ -45,11 +65,11 @@ export async function asyncAnalyzeFile(
   if (!result) {
     result = {
       path: filePath,
-      fileType: ext.slice(1) as FileAnalyzeResult['fileType'],
       moduleSpecifiers: [],
       declareVars: [],
       parentModules: [],
     };
   }
+  result.fileType = ext.slice(1) as FileAnalyzeResult['fileType'];
   return result;
 }

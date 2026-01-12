@@ -2,64 +2,32 @@
 import * as ts from 'typescript';
 import * as path from 'path';
 import type { IDeclareVar, FileAnalyzeResult, VarType } from './types.js';
-import { getFileContent } from '../files.js';
 import { handleImportDeclaration, getNodeNormalizedHash,getVarType, isTsTypeNodeKind } from './helper.js';
 import { resolveModuleSpecifier } from './resolveModuleSpecifier.js';
 import { DeclareVar } from './DeclareVar.js';
 
-import { parse, registerTS } from "@vue/compiler-sfc";
-import type { ICompilerOptions } from '../types.js';
+import type { IAnalyzeAstOptions } from '../types.js';
 
-async function getSourceFile(filePath: string): Promise<ts.SourceFile> {
-  const sourceCode = await getFileContent(filePath);
-  if (filePath.endsWith('.vue')) {
-    const parsed = parse(sourceCode);
+export async function analyzeTsFile(options: IAnalyzeAstOptions): Promise<FileAnalyzeResult | undefined> {
+  const { filePath, sourceFile, checker, compilerOptions, dependencies } = options;
 
-    if (parsed.descriptor.script || parsed.descriptor.scriptSetup) {
-      registerTS(() => ts);
-      // const scriptResult = compileScript(parsed.descriptor, { id: filePath });
-      const sourceFile = ts.createSourceFile(
-        filePath,
-        parsed.descriptor.scriptSetup!.content,
-        ts.ScriptTarget.Latest,
-        true,
-        // ts.ScriptKind.TSX
-      )
-      return sourceFile;
-    }
+  if (!sourceFile) {
+    console.log(`analyzeTsFile: sourceFile is undefined, filePath: ${filePath}`);
+    return;
   }
-  const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
-  return sourceFile;
-}
-
-export async function analyzeTsFile(
-  filePath: string,
-  tsconfig: ICompilerOptions,
-  installDeps: string[] = []): Promise<FileAnalyzeResult> {
-
-  // const sourceCode = await getFileContent(filePath);
-  // const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
-  const sourceFile = await getSourceFile(filePath);
-
   // 打印 AST 树（调试用）
   // printAstTree(sourceFile, sourceFile);
 
   const result: FileAnalyzeResult = {
     path: filePath,
-    fileType: filePath.endsWith('.vue') ? 'vue' : filePath.endsWith('.js') ? 'js' : 'ts',
     moduleSpecifiers: [],
     declareVars: [],
     parentModules: [],
   };
 
-
-
   const moduleSpecifiers = new Set<string>();
   const currentDir = path.dirname(filePath);
 
-  // 创建 Program 和 TypeChecker（用于符号检查）
-  const program = ts.createProgram([filePath], {});
-  const checker = program.getTypeChecker();
 
   // 存储所有 导入和导出的 变量（name -> IDeclareVar）
   const effectVarMap = new Map<string, IDeclareVar>();
@@ -72,9 +40,17 @@ export async function analyzeTsFile(
       const name = node.text;
       const existing = effectVarMap.get(name);
       // 避免将自身添加为依赖
-      if (existing && existing.name !== decl.name) {
-        decl.dependencies.push(existing);
+      if (existing  && existing.name !== decl.name && existing.astNode) {
+        const outerSymbol = checker.getSymbolAtLocation(existing.astNode);
+        const symbol = checker.getSymbolAtLocation(node);
+        if (symbol === outerSymbol) {
+          decl.dependencies.push(existing);
+        }
       }
+      // 避免将自身添加为依赖
+      // if (existing && existing.name !== decl.name) {
+      //   decl.dependencies.push(existing);
+      // }
     }
     node.forEachChild(child => visit(child, decl));
   }
@@ -94,7 +70,7 @@ export async function analyzeTsFile(
 
     // import declarations
     if (ts.isImportDeclaration(node) && node.importClause) {
-      const decls = handleImportDeclaration(node, tsconfig, currentDir, installDeps);
+      const decls = handleImportDeclaration(node, compilerOptions, currentDir, dependencies);
       for (const decl of decls) {
         // compute astHash for import-created decls
         try { decl.astHash = getNodeNormalizedHash(node, sourceFile); } catch (e) {}
@@ -110,7 +86,7 @@ export async function analyzeTsFile(
       let moduleSpecifier = undefined;
       if (node.moduleSpecifier) {
         const raw = node.moduleSpecifier.getText().slice(1, -1);
-        moduleSpecifier = resolveModuleSpecifier(raw, tsconfig, currentDir, installDeps);
+        moduleSpecifier = resolveModuleSpecifier(raw, compilerOptions, currentDir, dependencies);
         moduleSpecifiers.add(moduleSpecifier);
       }
 
@@ -131,6 +107,7 @@ export async function analyzeTsFile(
               moduleSpecifier,
               astHash: getNodeNormalizedHash(node, sourceFile),
               dependencies: [],
+              astNode: el.propertyName || el.name,
             };
             result.declareVars.push(decl);
             effectVarMap.set(name, decl);
@@ -162,6 +139,7 @@ export async function analyzeTsFile(
               isExported,
               isTsType: isTsTypeNode,
               astHash: d.initializer ? getNodeNormalizedHash(d.initializer, sourceFile) : '',
+              astNode: d.name,
             });
             result.declareVars.push(decl);
             effectVarMap.set(name, decl);
@@ -177,6 +155,7 @@ export async function analyzeTsFile(
           isExported,
           isTsType: isTsTypeNode,
           astHash: getNodeNormalizedHash(node, sourceFile),
+          astNode: node.name,
         });
         result.declareVars.push(decl);
         effectVarMap.set(name, decl);

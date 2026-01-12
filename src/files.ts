@@ -17,7 +17,7 @@
  *   excludeDirs: ['node_modules']
  * });
  */
-import { promises as fs, existsSync } from "fs";
+import { promises as fs, existsSync, readFileSync } from "fs";
 import path from "path";
 import { TraverseOptions } from "./types.js";
 
@@ -57,6 +57,16 @@ export async function traverseFiles(
 export async function getFileContent(filePath: string): Promise<string> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
+    return content;
+  } catch (error) {
+    console.error(`读取文件 ${filePath} 时出错:`, error);
+    throw error;
+  }
+}
+
+export function getFileContentSync(filePath: string): string {
+  try {
+    const content = readFileSync(filePath, 'utf-8');
     return content;
   } catch (error) {
     console.error(`读取文件 ${filePath} 时出错:`, error);

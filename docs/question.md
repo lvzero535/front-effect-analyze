@@ -7,3 +7,10 @@
 5. 增量分析后,依赖关系不存在了, 需要替换到已分析里面拿到依赖关系. ok
 6. 导入变量使用了别名，需要根据别名映射到实际的文件路径。 没解决.
 7. worker 池的数量, 不能超过 cpu 数量的一半. ok
+8. css, scss, less 等文件的分析, 目前只支持 ts, vue 文件的分析.
+9. 图片文件的分析, 目前只支持分析图片文件的引用.
+10. 动态导入的文件, 也需要分析其依赖关系.
+11. 需要引入ts.createProgram, typechecker 来分析文件的变量依赖关系.
+12. TypeChecker 只能在“名字节点”上返回 Symbol -- ok
+
+Request content was evicted from inspector cache

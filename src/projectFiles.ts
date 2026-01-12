@@ -2,8 +2,7 @@ import path from "path";
 import { getFileContent, traverseFiles } from "./files.js";
 import { ProjectFilesOptions } from "./types";
 
- async function getTsconfigConfig(projectRoot:string, tsconfigFileName: string) {
-    const tsconfigPath = path.join(projectRoot, tsconfigFileName);
+ async function getTsconfigConfig(tsconfigPath: string) {
     const tsconfigContent = await getFileContent(tsconfigPath);
     const tsconfig = JSON.parse(tsconfigContent);
     return tsconfig;
@@ -22,11 +21,11 @@ export async function loadProjectFiles(projectRoot: string, options: ProjectFile
     isTraverseFile = true,
     ...fileOps
    } = options;
-  const tsconfigJson = await getTsconfigConfig(projectRoot, tsconfigFileName);
+  const tsconfigPath = path.resolve(projectRoot, tsconfigFileName);
+  const tsconfigJson = await getTsconfigConfig(tsconfigPath);
 
   const packageJson = await getPackageConfig(projectRoot);
 
   const files = isTraverseFile ? await traverseFiles(projectRoot, fileOps) : [];
-
-  return { tsconfigJson, packageJson, files };
+  return { tsconfigJson, packageJson, files, tsconfigPath };
 }

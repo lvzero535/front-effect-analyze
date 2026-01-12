@@ -19,13 +19,13 @@ function reset() {
   fileCount = 0;
 }
 
-function createWorker(files: string[], compilerOptions: ICompilerOptions, dependencies: string[], resolve: (value: Result) => void) {
+function createWorker(files: string[],
+  projectRoot: string, resolve: (value: Result) => void) {
   const worker = new Worker(
       new URL('./worker.js', import.meta.url),
       {
         workerData: {
-          compilerOptions,
-          dependencies,
+          projectRoot
         }
       });
 
@@ -84,7 +84,10 @@ function mergeResults(resolve: (value: Result) => void) {
   resolve(new Map(results.map((item) => [item.path, item])))
 }
 
-export async function workerAnalyzeFile(allFiles: string[], compilerOptions: ICompilerOptions, dependencies: string[]): Promise<Result> {
+export async function workerAnalyzeFile(
+  allFiles: string[],
+  projectRoot: string,
+): Promise<Result> {
   const CPU_COUNT = os.cpus().length;
   let WORKER_COUNT = Math.max(1, Math.floor(CPU_COUNT / 2));
 
@@ -99,7 +102,7 @@ export async function workerAnalyzeFile(allFiles: string[], compilerOptions: ICo
   
   return new Promise((resolve) => {
     for (let i = 0; i < WORKER_COUNT; i++) {
-      createWorker(allFiles, compilerOptions, dependencies, resolve);
+      createWorker(allFiles, projectRoot, resolve);
     }
   });
 }

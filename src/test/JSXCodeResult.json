@@ -1,0 +1,40 @@
+{
+  "path": "E:/DevPrograms/CodeRepository/dev-products/nest-vue-app/nest-vue-web/src/utils/tree.ts",
+  "moduleSpecifiers": [
+    "lodash-es"
+  ],
+  "declareVars": [
+    {
+      "dependencies": [],
+      "name": "isArray",
+      "type": "const",
+      "isExported": false,
+      "isImported": true,
+      "isTsType": false,
+      "astHash": "7e8c025af8d0df3bfbc9b63669bbf19e000a35aad51de8dce33d64422707bd44",
+      "moduleSpecifier": "lodash-es"
+    },
+    {
+      "dependencies": [
+        {
+          "dependencies": [],
+          "name": "isArray",
+          "type": "const",
+          "isExported": false,
+          "isImported": true,
+          "isTsType": false,
+          "astHash": "7e8c025af8d0df3bfbc9b63669bbf19e000a35aad51de8dce33d64422707bd44",
+          "moduleSpecifier": "lodash-es"
+        }
+      ],
+      "name": "traverseTree",
+      "type": "function",
+      "isExported": true,
+      "isImported": false,
+      "isTsType": false,
+      "astHash": "046f28feb4f14360224b5bf7e41672e9abc7217b7afcd402e5844f61c26fd324"
+    }
+  ],
+  "parentModules": [],
+  "fileType": "ts"
+}

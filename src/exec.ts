@@ -9,7 +9,6 @@ start({
   fileOps: {
     includeExtensions: [".ts", ".vue"],
     excludeDirs: ["node_modules", ".git", 'dist', 'build', '.vscode'],
-    tsconfigFileName: "tsconfig.app.json",
   },
   analyzeJsonFile: {
     fileName: "analyze.json",
@@ -17,6 +16,6 @@ start({
   resultJsonFile: {
     fileName: "result.json",
   },
-  isFullAnalyze: false,
+  isFullAnalyze: true,
   enableWorker: true,
 });

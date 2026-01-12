@@ -5,7 +5,13 @@ import { getFileContent, writeFileContent } from "./files.js";
 import type { JsonFileSaveOptions, EffectResult, Result } from "./types.js";
 
 export function jsonToString(json: any, indent = 2): string {
-  return JSON.stringify(json, null, indent);
+  return JSON.stringify(json, (key, value) => {
+    // 忽略 astNode 字段
+    if (key === 'astNode') {
+      return undefined;
+    }
+    return value;
+  }, indent);
 }
 
 export async function getAnalyzeJson(projectRoot: Required<JsonFileSaveOptions>): Promise<Result> {

@@ -1,9 +1,9 @@
 import path from "path";
 import { analyzeFiles } from "./analyze.js";
-import { getAnalyzeJson, getDependencies, resultToTree, saveAnalyzeJson, saveResultJson } from "./helper.js";
-import { loadProjectFiles } from "./projectFiles.js";
+import { getAnalyzeJson, resultToTree, saveAnalyzeJson, saveResultJson } from "./helper.js";
 import { diffAnalyzeJson } from "./diff.js";
-import type { IOptions, IAnalyzeOptions, Result } from "./types.js";
+import type { IOptions, Result } from "./types.js";
+import { traverseFiles } from "./files.js";
 
 function normalizeOptions(options: IOptions) {
   const { projectRoot, analyzeJsonFile, resultJsonFile, isFullAnalyze = true, fileOps } = options;
@@ -22,9 +22,6 @@ function normalizeOptions(options: IOptions) {
       includeExtensions: fileOps?.includeExtensions || [".ts", ".js", ".vue"],
       excludeDirs: fileOps?.excludeDirs || [],
       excludeExtensions: fileOps?.excludeExtensions || [],
-      tsconfigFileName: fileOps?.tsconfigFileName || "tsconfig.json",
-      // 是否遍历文件，全量分析时为true，增量分析时为false
-      isTraverseFile: fileOps?.isTraverseFile || isFullAnalyze,
     },
   };
 }
@@ -33,18 +30,15 @@ export async function start(options: IOptions) {
   const normalized = normalizeOptions(options);
   const { projectRoot, analyzeJsonFile, resultJsonFile, modifiedFiles, isFullAnalyze, fileOps } = normalized;
 
-  const projectFiles = await loadProjectFiles(projectRoot, fileOps);
-
-  const analyzeOptions: IAnalyzeOptions = {
-    enableWorker: options.enableWorker,
-    files: projectFiles.files,
-    compilerOptions: projectFiles.tsconfigJson.compilerOptions || {},
-    dependencies: getDependencies(projectFiles.packageJson),
-  }
 
   if (isFullAnalyze) {
+    const files = await traverseFiles(projectRoot, fileOps);
     // 全量分析
-    const results = await analyzeFiles(analyzeOptions);
+    const results = await analyzeFiles({
+      projectRoot,
+      enableWorker: options.enableWorker,
+      files,
+    });
     resultToTree(results);
     saveAnalyzeJson(analyzeJsonFile, Array.from(results.values()));
     return; // 全量分析完成后，返回
@@ -58,9 +52,12 @@ export async function start(options: IOptions) {
     return; // 增量分析文件为空，返回
   }
 
-  analyzeOptions.files = filteredModifiedFiles;
 
-  const modifiedResults = await analyzeFiles(analyzeOptions);
+  const modifiedResults = await analyzeFiles({
+      projectRoot,
+      enableWorker: options.enableWorker,
+      files: filteredModifiedFiles,
+    });
 
   const tempResult: Result = new Map();
 
