@@ -1,4 +1,3 @@
-import ts from 'typescript';
 import type { IDeclareVar, VarType } from './types.js';
 
 export class DeclareVar implements IDeclareVar {
@@ -9,8 +8,8 @@ export class DeclareVar implements IDeclareVar {
   isTsType: boolean;
   astHash?: string;
   moduleSpecifier?: string;
-  dependencies: IDeclareVar[] = [];
-  astNode?: ts.Node;
+  dependencies: string[] = [];
+  astNode?: IDeclareVar['astNode'];
 
   constructor(options: {
     name: string;
@@ -20,7 +19,7 @@ export class DeclareVar implements IDeclareVar {
     isTsType?: boolean;
     astHash?: string;
     moduleSpecifier?: string;
-    astNode?: ts.Node;
+    astNode?: IDeclareVar['astNode'];
   }) {
     this.name = options.name;
     this.type = options.type;
@@ -30,15 +29,6 @@ export class DeclareVar implements IDeclareVar {
     this.astHash = options.astHash;
     this.moduleSpecifier = options.moduleSpecifier;
     this.astNode = options.astNode;
-  }
-
-  /**
-   * 添加依赖变量
-   */
-  addDependency(dep: IDeclareVar): void {
-    if (!this.dependencies.some(d => d.name === dep.name)) {
-      this.dependencies.push(dep);
-    }
   }
 
   /**

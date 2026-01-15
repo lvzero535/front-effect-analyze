@@ -19,6 +19,8 @@ export function handleImportDeclaration(
 
   // get import clause
   const importClause = node.importClause;
+
+  // import './polyfill'; 没有 import clause 时，直接返回空数组
   if (!importClause) return IDeclareVars;
 
   // default import: import X from 'module'
@@ -29,7 +31,9 @@ export function handleImportDeclaration(
       isExported: false,
       isImported: true,
       moduleSpecifier: importPath,
-      astNode: importClause.name,
+      astNode: {
+        symbol: importClause.name,
+      }
     }));
   }
 
@@ -41,7 +45,9 @@ export function handleImportDeclaration(
       isExported: false,
       isImported: true,
       moduleSpecifier: importPath,
-      astNode: importClause.namedBindings.name,
+      astNode: {
+        symbol: importClause.namedBindings.name,
+      }
     }));
   }
 
@@ -55,7 +61,9 @@ export function handleImportDeclaration(
         isExported: false,
         isImported: true,
         moduleSpecifier: importPath,
-        astNode: element.name,
+        astNode: {
+          symbol: element.name,
+        },
       }));
     });
   }

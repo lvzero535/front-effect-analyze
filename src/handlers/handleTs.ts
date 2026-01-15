@@ -1,10 +1,7 @@
-// tsFileAnalyzer.ts（完整更新版）
 import * as ts from 'typescript';
-import * as path from 'path';
-import type { IDeclareVar, FileAnalyzeResult, VarType } from './types.js';
-import { handleImportDeclaration, getNodeNormalizedHash,getVarType, isTsTypeNodeKind } from './helper.js';
-import { resolveModuleSpecifier } from './resolveModuleSpecifier.js';
-import { DeclareVar } from './DeclareVar.js';
+import type { IDeclareVar, FileAnalyzeResult } from './types.js';
+import { createHandlers, type AnalysisContext } from './commonHandlers.js';
+import { traverseNode } from './traversetNode.js';
 
 import type { IAnalyzeAstOptions } from '../types.js';
 
@@ -15,8 +12,6 @@ export async function analyzeTsFile(options: IAnalyzeAstOptions): Promise<FileAn
     console.log(`analyzeTsFile: sourceFile is undefined, filePath: ${filePath}`);
     return;
   }
-  // 打印 AST 树（调试用）
-  // printAstTree(sourceFile, sourceFile);
 
   const result: FileAnalyzeResult = {
     path: filePath,
@@ -25,149 +20,76 @@ export async function analyzeTsFile(options: IAnalyzeAstOptions): Promise<FileAn
     parentModules: [],
   };
 
-  const moduleSpecifiers = new Set<string>();
-  const currentDir = path.dirname(filePath);
+  // 创建分析上下文
+  const context: AnalysisContext = {
+    sourceFile,
+    filePath,
+    checker,
+    compilerOptions,
+    dependencies,
+    declareVars: result.declareVars,
+    moduleSpecifiers: new Set<string>(),
+    variableMap: new Map<string, IDeclareVar>(),
+  };
 
+  // 创建处理器
+  const handlers = createHandlers(context);
 
-  // 存储所有 导入和导出的 变量（name -> IDeclareVar）
-  const effectVarMap = new Map<string, IDeclareVar>();
+  // 递归遍历 AST 树
+  traverseNode(sourceFile, handlers, undefined, false);
 
-  
+  // 处理依赖关系分析
+  analyzeDependencies(context);
 
-  // start 递归遍历 AST 节点，检测对 effectVarMap 中声明的引用
-  function visit(node: ts.Node, decl: IDeclareVar) {
-    if (ts.isIdentifier(node)) {
-      const name = node.text;
-      const existing = effectVarMap.get(name);
-      // 避免将自身添加为依赖
-      if (existing  && existing.name !== decl.name && existing.astNode) {
-        const outerSymbol = checker.getSymbolAtLocation(existing.astNode);
-        const symbol = checker.getSymbolAtLocation(node);
-        if (symbol === outerSymbol) {
-          decl.dependencies.push(existing);
-        }
-      }
-      // 避免将自身添加为依赖
-      // if (existing && existing.name !== decl.name) {
-      //   decl.dependencies.push(existing);
-      // }
-    }
-    node.forEachChild(child => visit(child, decl));
-  }
+  // 将 moduleSpecifiers Set 转换为数组
+  result.moduleSpecifiers = Array.from(context.moduleSpecifiers);
 
-  const effectFns: Function[] = [];
-
-  function addEffectFn(node: ts.Node, decl: IDeclareVar) {
-    if (ts.isArrowFunction(node) || ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) {
-      node.body && effectFns.push(() => visit(node.body!, decl));
-    }
-  }
-  // end
-
-
-  sourceFile.forEachChild(node => {
-    // 这里返回true后，会禁止了下次的遍历
-
-    // import declarations
-    if (ts.isImportDeclaration(node) && node.importClause) {
-      const decls = handleImportDeclaration(node, compilerOptions, currentDir, dependencies);
-      for (const decl of decls) {
-        // compute astHash for import-created decls
-        try { decl.astHash = getNodeNormalizedHash(node, sourceFile); } catch (e) {}
-        result.declareVars.push(decl);
-        if (decl.moduleSpecifier) moduleSpecifiers.add(decl.moduleSpecifier);
-        effectVarMap.set(decl.name, decl);
-      }
-      return;
-    }
-
-    // export declarations (export { A } from 'x' or export { A })
-    if (ts.isExportDeclaration(node)) {
-      let moduleSpecifier = undefined;
-      if (node.moduleSpecifier) {
-        const raw = node.moduleSpecifier.getText().slice(1, -1);
-        moduleSpecifier = resolveModuleSpecifier(raw, compilerOptions, currentDir, dependencies);
-        moduleSpecifiers.add(moduleSpecifier);
-      }
-
-      if (node.exportClause && ts.isNamedExports(node.exportClause)) {
-        node.exportClause.elements.forEach(el => {
-          const name = el.propertyName?.text || el.name.text;
-          const existing = result.declareVars.find(d => d.name === name);
-          if (existing) {
-            existing.isExported = true;
-            effectVarMap.set(name, existing);
-          } else {
-            const decl: IDeclareVar = {
-              name,
-              type: 'const',
-              isExported: true,
-              isImported: true,
-              isTsType: false,
-              moduleSpecifier,
-              astHash: getNodeNormalizedHash(node, sourceFile),
-              dependencies: [],
-              astNode: el.propertyName || el.name,
-            };
-            result.declareVars.push(decl);
-            effectVarMap.set(name, decl);
-          }
-        });
-      }
-      return;
-    }
-
-    if (
-      ts.isVariableStatement(node) ||
-      ts.isFunctionDeclaration(node) ||
-      ts.isClassDeclaration(node) ||
-      ts.isInterfaceDeclaration(node) ||
-      ts.isTypeAliasDeclaration(node) ||
-      ts.isEnumDeclaration(node)
-    ) {
-      const isExported = !!node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
-      const isTsTypeNode = isTsTypeNodeKind(node);
-
-      if (ts.isVariableStatement(node)) {
-        node.declarationList.declarations.forEach(d => {
-          if (ts.isIdentifier(d.name)) {
-            const name = d.name.text;
-            const type: VarType = getVarType(d, isTsTypeNode);
-            const decl: IDeclareVar = new DeclareVar({
-              name,
-              type,
-              isExported,
-              isTsType: isTsTypeNode,
-              astHash: d.initializer ? getNodeNormalizedHash(d.initializer, sourceFile) : '',
-              astNode: d.name,
-            });
-            result.declareVars.push(decl);
-            effectVarMap.set(name, decl);
-            addEffectFn(d.initializer || d, decl);
-          };
-        });
-      } else {
-        const name = node.name?.text || '';
-        const type: VarType = getVarType(node, isTsTypeNode);
-        const decl: IDeclareVar = new DeclareVar({
-          name,
-          type,
-          isExported,
-          isTsType: isTsTypeNode,
-          astHash: getNodeNormalizedHash(node, sourceFile),
-          astNode: node.name,
-        });
-        result.declareVars.push(decl);
-        effectVarMap.set(name, decl);
-        addEffectFn(node, decl);
-      }
-
-    }
-  });
-
-
-  effectFns.forEach(fn => fn());
-  
-  result.moduleSpecifiers = Array.from(moduleSpecifiers);
   return result;
+}
+
+/**
+ * 分析声明变量之间的依赖关系
+ * 通过遍历每个声明的定义，找出其引用的其他声明
+ */
+function analyzeDependencies(context: AnalysisContext) {
+  const { declareVars, checker } = context;
+
+  declareVars.forEach(decl => {
+    if (!decl.astNode) return;
+
+    // 查找声明的初始化器或实现体
+    decl.astNode.pendingNodes?.forEach(child => 
+      visitNodeForDependencies(child, decl, context.variableMap, checker)
+    );
+  });
+}
+
+/**
+ * 遍历节点以收集依赖关系
+ */
+function visitNodeForDependencies(
+  node: ts.Node,
+  decl: IDeclareVar,
+  variableMap: Map<string, IDeclareVar>,
+  checker: ts.TypeChecker
+) {
+  if (ts.isIdentifier(node)) {
+    const name = node.text;
+    const existing = variableMap.get(name);
+
+    // 避免循环依赖和自引用
+    if (existing && existing.name !== decl.name && existing.astNode?.symbol) {
+      try {
+        const outerSymbol = checker.getSymbolAtLocation(existing.astNode.symbol);
+        const symbol = checker.getSymbolAtLocation(node);
+        if (symbol === outerSymbol && !decl.dependencies.includes(existing.name)) {
+          decl.dependencies.push(existing.name);
+        }
+      } catch (e) {
+        // 类型检查可能失败，忽略
+      }
+    }
+  }
+
+  node.forEachChild(child => visitNodeForDependencies(child, decl, variableMap, checker));
 }

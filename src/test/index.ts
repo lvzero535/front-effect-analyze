@@ -10,7 +10,7 @@ import { asyncAnalyzeFile } from '../handlers/index.js';
 // testAnalyzeJsFile();
 
 async function testAnalyzeJsxFile() {
-  const jsxFile = 'E:/DevPrograms/CodeRepository/dev-products/nest-vue-app/nest-vue-web/src/utils/tree.ts';
+  const jsxFile = "E:\\DevPrograms\\CodeRepository\\dev-products\\nest-vue-app\\nest-vue-web\\src\\components\\toolbar\\src\\types.ts";
   const result = await asyncAnalyzeFile(jsxFile, 'E:/DevPrograms/CodeRepository/dev-products/nest-vue-app/nest-vue-web');
   if (!result) {
     return;

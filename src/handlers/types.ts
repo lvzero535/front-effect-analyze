@@ -20,7 +20,10 @@ export interface IDeclareVar {
   /**
    * 变量在 AST 中的节点, 用于checker后续分析变化
    */
-  astNode?: ts.Node;
+  astNode?: {
+    symbol?: ts.Node; // 确认当前变量的符号节点，用于后续分析
+    pendingNodes?: ts.Node[]; // 导入的没有 当前节点的initializer中可能依赖于其他节点，用于后续分析
+  };
 
   /**
    * 变量的类型, 如 function, class, const 等
@@ -54,7 +57,7 @@ export interface IDeclareVar {
   /**
    * 这个变量所依赖的其他变量，如函数调用中使用的变量，对象属性引用了其他变量等
    */
-  dependencies: IDeclareVar[];
+  dependencies: string[];
 }
 
 /**
@@ -89,3 +92,5 @@ export interface FileAnalyzeResult {
    */
   parentModules: string[];
 }
+
+export type Handlers = Partial<Record<ts.SyntaxKind, (n: ts.Node, parent?: ts.Node) => boolean | void>>;

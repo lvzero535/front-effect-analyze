@@ -150,7 +150,7 @@ function findModifiedDependenciesFiles(
         // 找出父文件导出的受影响过的变量
         exportNamesInParent = parentItem.declareVars
         .filter(it => it.isExported)
-        .filter(it => it.dependencies.some(d => commonNames.includes(d.name)))
+        .filter(it => it.dependencies.some(d => commonNames.includes(d)))
         .map(it => it.name);
       }
       

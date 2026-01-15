@@ -13,4 +13,4 @@
 11. 需要引入ts.createProgram, typechecker 来分析文件的变量依赖关系.
 12. TypeChecker 只能在“名字节点”上返回 Symbol -- ok
 
-Request content was evicted from inspector cache
+13. 做TS类型分析时，有两个类型是一样的，FirstStatement，VariableStatement都是243，FirstStatement是一个范围标记，不是一个真正的节点类型。要使用ts.SyntaxKind.VariableStatement来判断是否是第一个语句。是不是变更声明语句。
